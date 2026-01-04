@@ -4,7 +4,6 @@ import { FaGithub, FaFacebook, FaDiscord, FaCat, FaEye, FaTimes, FaMusic, FaPlay
 import { SiJavascript, SiPython, SiCss3 } from 'react-icons/si'
 import { saveVisitor, getVisitorCount, getVisitors } from './firebase'
 import { useAdaptivePerformance } from './hooks/useAdaptivePerformance'
-import PerformanceIndicator from './components/PerformanceIndicator'
 import './App.css'
 
 // Debounce utility function
@@ -604,30 +603,38 @@ const ContactSection = () => {
 // ============================================
 // PLAYLIST - THAY ĐỔI DANH SÁCH NHẠC Ở ĐÂY
 // ============================================
-// Bỏ file .mp3 vào thư mục: public/music/
-// Đặt tên: music1.mp3, music2.mp3, music3.mp3...
-// Chỉ cần sửa title và artist bên dưới
+// 🎵 HƯỚNG DẪN THÊM NHẠC MỚI:
 // ============================================
-const playlist = [
-  { 
-    id: 1, 
-    title: 'Tháng 6 và em ❤️',      // ← Sửa tên bài
-    artist: 'Elaina',       // ← Sửa tên ca sĩ
-    src: '/music/music1.mp3'
-  },
-  { 
-    id: 2, 
-    title: 'Làm người yêu em nhé', 
-    artist: '',
-    src: '/music/music2.mp3'
-  },
-  { 
-    id: 3, 
-    title: 'Kỵ sĩ ánh sao', 
-    artist: '',
-    src: '/music/music3.mp3'
-  },
-]
+// Chỉ cần bỏ file .mp3 vào: public/music/
+// Website sẽ TỰ ĐỘNG quét và lấy tên file làm tên bài!
+// KHÔNG CẦN SỬA CODE GÌ CẢ!
+// 
+// VD: Bỏ "Thang-6-va-em.mp3" → Hiển thị: "Thang 6 va em"
+// ============================================
+
+// Tự động quét tất cả file .mp3 trong thư mục public/music/
+const musicModules = import.meta.glob('/public/music/*.mp3', { eager: true, as: 'url' })
+
+// Tạo playlist từ các file tìm được
+const playlist = Object.keys(musicModules)
+  .filter(path => path.endsWith('.mp3'))
+  .sort() // Sắp xếp theo tên file
+  .map((path, index) => {
+    // Lấy tên file từ đường dẫn
+    const filename = path.split('/').pop()
+    
+    // Lấy tên bài từ tên file (bỏ đuôi .mp3 và format đẹp)
+    let title = filename.replace('.mp3', '')
+    title = title.replace(/-/g, ' ') // Đổi dấu - thành khoảng trắng
+    title = title.replace(/_/g, ' ') // Đổi dấu _ thành khoảng trắng
+    
+    return {
+      id: index + 1,
+      title: title,
+      artist: '',
+      src: `/music/${filename}`
+    }
+  })
 
 // Format time
 const formatTime = (seconds) => {
@@ -647,7 +654,10 @@ const MusicPlayer = ({ onBeatChange }) => {
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(50)
   const [isMuted, setIsMuted] = useState(false)
-  const [currentTrack, setCurrentTrack] = useState(0)
+  const [currentTrack, setCurrentTrack] = useState(() => {
+    // Random bài đầu tiên khi load trang
+    return Math.floor(Math.random() * playlist.length)
+  })
   const [showPlaylist, setShowPlaylist] = useState(false)
 
   const currentSong = playlist[currentTrack]
@@ -966,7 +976,6 @@ function App() {
           <div className="bg-overlay" />
           <Navbar />
           <VisitorCounter />
-          <PerformanceIndicator />
           <main>
             <HeroSection beat={beat} />
             <ProjectsSection />

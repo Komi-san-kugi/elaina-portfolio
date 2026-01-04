@@ -19,20 +19,24 @@ export const getOptimizedConfig = () => {
   
   return {
     // Animation settings
-    animationDuration: mobile ? 0.8 : 0.6,
+    animationDuration: mobile ? 1.0 : 0.6,
     reducedMotion: lowEnd,
     
-    // Audio settings
-    audioFFTSize: mobile ? 128 : 256,
-    audioUpdateInterval: mobile ? 100 : 16,
+    // Audio settings - Mobile giảm mạnh để tăng performance
+    audioFFTSize: mobile ? 64 : 256,
+    audioUpdateInterval: mobile ? 200 : 16,
     
-    // Visual effects
+    // Visual effects - Mobile tắt hết hiệu ứng nặng
     enableHeavyEffects: !mobile && !lowEnd,
-    rainbowSpeed: mobile ? 8 : 3,
+    rainbowSpeed: mobile ? 15 : 3, // Mobile chậm hơn nhiều
+    
+    // Beat detection - Mobile giảm sensitivity
+    beatSensitivity: mobile ? 0.01 : 0.05,
     
     // Performance
     enableLazyLoading: true,
-    enableImageOptimization: true
+    enableImageOptimization: true,
+    enableGlow: !mobile // Tắt glow trên mobile
   }
 }
 

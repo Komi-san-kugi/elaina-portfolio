@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getOptimizedConfig } from '../utils/performance'
+import { getOptimizedConfig, isMobile } from '../utils/performance'
 
 export const useAdaptivePerformance = () => {
-  const [performanceLevel, setPerformanceLevel] = useState('high')
+  // Mobile tự động bắt đầu ở low mode, desktop ở high mode
+  const [performanceLevel, setPerformanceLevel] = useState(isMobile() ? 'low' : 'high')
   const [config, setConfig] = useState(getOptimizedConfig())
 
   // Measure FPS to adjust performance

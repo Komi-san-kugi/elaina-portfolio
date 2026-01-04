@@ -7,6 +7,19 @@ import { useAdaptivePerformance } from './hooks/useAdaptivePerformance'
 import PerformanceIndicator from './components/PerformanceIndicator'
 import './App.css'
 
+// Debounce utility function
+const debounce = (func, wait) => {
+  let timeout
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout)
+      func(...args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+  }
+}
+
 // Visitor Counter Component - Hiển thị số người đã xem
 const VisitorCounter = () => {
   const [count, setCount] = useState(0)

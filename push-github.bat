@@ -9,18 +9,20 @@ echo Dự án hiện tại: %CD%
 echo.
 
 echo Kiểm tra remote hiện tại:
-git remote get-url origin 2>nul
+git remote get-url origin >nul 2>&1
 if errorlevel 1 (
     echo.
     echo ❌ Chưa có remote GitHub!
     echo.
-    set /p repo_url="Nhập URL GitHub repo (vd: https://github.com/username/repo.git): "
+    set /p new_url="Nhập URL GitHub repo: "
     echo.
     echo Đang thêm remote...
-    git remote add origin "%repo_url%"
-    echo ✓ Đã thêm remote: %repo_url%
+    git remote add origin "%new_url%"
+    echo ✓ Đã thêm remote
 ) else (
     echo ✓ Đã có remote sẵn
+    echo Remote URL:
+    git remote get-url origin
 )
 
 echo.
@@ -37,7 +39,7 @@ echo [2/4] Thêm tất cả thay đổi...
 git add .
 
 echo [3/4] Commit...
-git commit -m "Update: %date% %time%" >nul 2>&1
+git commit -m "Update" >nul 2>&1
 
 echo [4/4] Push lên GitHub...
 git push origin main --force
@@ -45,16 +47,28 @@ git push origin main --force
 if errorlevel 1 (
     echo.
     echo ❌ PUSH THẤT BẠI!
-    echo Kiểm tra lại URL và quyền truy cập
-    pause
-    exit
+    echo.
+    echo Có thể do:
+    echo 1. URL GitHub sai
+    echo 2. Không có quyền truy cập
+    echo 3. Repo không tồn tại
+    echo.
+    echo Muốn thử lại với URL mới? (y/n)
+    set /p retry=
+    if /i "%retry%"=="y" (
+        git remote remove origin
+        set /p new_url="Nhập URL mới: "
+        git remote add origin "%new_url%"
+        git push origin main --force
+    )
+) else (
+    echo.
+    echo ========================================
+    echo    ✅ THÀNH CÔNG!
+    echo ========================================
+    echo.
+    echo Code đã được push lên GitHub!
 )
 
-echo.
-echo ========================================
-echo    ✅ THÀNH CÔNG!
-echo ========================================
-echo.
-echo Code đã được push lên GitHub!
 echo.
 pause

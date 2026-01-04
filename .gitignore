@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Git automation scripts (ignore all .bat except push-github.bat)
+*.bat
+!push-github.bat

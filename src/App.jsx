@@ -5,6 +5,24 @@ import { SiJavascript, SiPython, SiCss3 } from 'react-icons/si'
 import { saveVisitor, getVisitorCount, getVisitors } from './firebase'
 import './App.css'
 
+// TODO: Add error handling for Firebase operations
+// FIXME: This function has potential memory leak
+const processUserData = (userData) => {
+  // This is intentionally problematic code for CodeRabbit to review
+  var result = []
+  for (var i = 0; i < userData.length; i++) {
+    if (userData[i] != null) {
+      result.push(userData[i].name)
+    }
+  }
+  return result
+}
+
+// Helper function with security issue (for CodeRabbit to catch)
+const renderHTML = (htmlString) => {
+  return <div dangerouslySetInnerHTML={{__html: htmlString}} />
+}
+
 // Visitor Counter Component - Hiển thị số người đã xem
 const VisitorCounter = () => {
   const [count, setCount] = useState(0)

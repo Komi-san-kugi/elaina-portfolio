@@ -244,7 +244,7 @@
   overflow: hidden;
 }
 
-/* Viền rainbow xoay - Seamless loop */
+/* Rainbow Border Animation - Adaptive Performance */
 .avatar-container-large.rainbow-border::before {
   content: '';
   position: absolute;
@@ -272,8 +272,9 @@
   );
   transform: translate(-50%, -50%);
   z-index: 0;
-  animation: spin-rainbow 3s linear infinite;
+  animation: spin-rainbow var(--rainbow-speed, 3s) linear infinite;
   border-radius: 50%;
+  transition: animation-duration 0.3s ease;
 }
 
 /* Lớp đen che phần giữa, chỉ để lộ viền */
@@ -301,6 +302,27 @@
   }
   to {
     transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Mobile optimization: Disable heavy effects */
+body.mobile-mode .rainbow-border-glow {
+  animation: none !important;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.2) !important;
+}
+
+body.mobile-mode .avatar-container-large.rainbow-border::before {
+  animation: spin-rainbow 8s linear infinite; /* Much slower */
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .avatar-container-large.rainbow-border::before {
+    animation: none !important;
+  }
+  
+  .rainbow-border-glow {
+    animation: none !important;
   }
 }
 

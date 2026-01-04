@@ -3,25 +3,9 @@ import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import { FaGithub, FaFacebook, FaDiscord, FaCat, FaEye, FaTimes, FaMusic, FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp, FaVolumeMute, FaList, FaMobileAlt, FaDesktop, FaLaptop } from 'react-icons/fa'
 import { SiJavascript, SiPython, SiCss3 } from 'react-icons/si'
 import { saveVisitor, getVisitorCount, getVisitors } from './firebase'
+import { useAdaptivePerformance } from '../hooks/useAdaptivePerformance'
+import PerformanceIndicator from './components/PerformanceIndicator'
 import './App.css'
-
-// TODO: Add error handling for Firebase operations
-// FIXME: This function has potential memory leak
-const processUserData = (userData) => {
-  // This is intentionally problematic code for CodeRabbit to review
-  var result = []
-  for (var i = 0; i < userData.length; i++) {
-    if (userData[i] != null) {
-      result.push(userData[i].name)
-    }
-  }
-  return result
-}
-
-// Helper function with security issue (for CodeRabbit to catch)
-const renderHTML = (htmlString) => {
-  return <div dangerouslySetInnerHTML={{__html: htmlString}} />
-}
 
 // Visitor Counter Component - Hiển thị số người đã xem
 const VisitorCounter = () => {
@@ -213,8 +197,11 @@ const Navbar = () => {
 const HeroSection = ({ beat }) => {
   const [showAvatar, setShowAvatar] = useState(false)
   
-  // Tính scale dựa trên beat (đập theo nhạc)
-  const beatScale = 1 + beat * 0.05 // Scale 1.0 - 1.05
+  // Mobile optimization: Reduce beat sensitivity
+  const isMobile = window.innerWidth <= 768
+  const beatScale = isMobile 
+    ? 1 + beat * 0.02  // Less scaling on mobile
+    : 1 + beat * 0.05  // Normal scaling on desktop
   
   const skills = [
     { name: 'HTML/CSS', icon: <SiCss3 /> },
@@ -653,7 +640,7 @@ const MusicPlayer = ({ onBeatChange }) => {
   const currentSong = playlist[currentTrack]
   const progress = duration ? (currentTime / duration) * 100 : 0
 
-  // Setup Audio Analyser
+  // Setup Audio Analyser with mobile optimization
   useEffect(() => {
     if (audioRef.current && !audioContextRef.current) {
       try {
@@ -664,13 +651,18 @@ const MusicPlayer = ({ onBeatChange }) => {
         
         source.connect(analyser)
         analyser.connect(audioContext.destination)
-        analyser.fftSize = 256
+        
+        // Mobile optimization: Smaller FFT size
+        const isMobile = window.innerWidth <= 768
+        analyser.fftSize = isMobile ? 128 : 256 // Smaller on mobile
         
         audioContextRef.current = audioContext
         analyserRef.current = analyser
         
-        // Analyze beat
+        // Analyze beat with mobile optimization
         const dataArray = new Uint8Array(analyser.frequencyBinCount)
+        const updateInterval = isMobile ? 100 : 16 // Less frequent on mobile
+        
         const updateBeat = () => {
           if (analyserRef.current) {
             analyserRef.current.getByteFrequencyData(dataArray)
@@ -679,7 +671,7 @@ const MusicPlayer = ({ onBeatChange }) => {
             const normalizedBeat = Math.min(bass / 255, 1)
             onBeatChange(normalizedBeat)
           }
-          requestAnimationFrame(updateBeat)
+          setTimeout(updateBeat, updateInterval)
         }
         updateBeat()
       } catch (e) {
@@ -922,11 +914,16 @@ function App() {
   const [deviceType, setDeviceType] = useState(() => detectDevice())
   const [loading, setLoading] = useState(true)
   const [beat, setBeat] = useState(0)
+  const { performanceLevel, config } = useAdaptivePerformance()
 
   // Auto detect device and apply class to body
   useEffect(() => {
     document.body.classList.remove('mobile-mode', 'desktop-mode')
     document.body.classList.add(`${deviceType}-mode`)
+    
+    // Add performance class
+    document.body.classList.remove('performance-low', 'performance-medium', 'performance-high')
+    document.body.classList.add(`performance-${performanceLevel}`)
 
     // Listen for resize to update device type
     const handleResize = () => {
@@ -938,7 +935,10 @@ function App() {
 
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [deviceType])
+  }, [deviceType, performanceLevel])
+
+  // Debounced beat change for performance
+  const debouncedSetBeat = debounce(setBeat, config.audioUpdateInterval)
 
   return (
     <>
@@ -953,12 +953,13 @@ function App() {
           <div className="bg-overlay" />
           <Navbar />
           <VisitorCounter />
+          <PerformanceIndicator />
           <main>
             <HeroSection beat={beat} />
             <ProjectsSection />
             <ContactSection />
           </main>
-          <MusicPlayer onBeatChange={setBeat} />
+          <MusicPlayer onBeatChange={debouncedSetBeat} />
         </>
       )}
     </>

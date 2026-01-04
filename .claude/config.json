@@ -1,0 +1,30 @@
+{
+  "autoMode": true,
+  "language": "vietnamese",
+  "projectType": "react-portfolio",
+  "designSystem": "glassmorphism",
+  "autoExecute": {
+    "performance": true,
+    "bugFixes": true,
+    "codeGeneration": true,
+    "optimization": true
+  },
+  "triggers": {
+    "optimize": ["tối ưu", "làm nhanh", "optimize", "cải thiện tốc độ"],
+    "fix": ["sửa lỗi", "fix", "không hoạt động", "bị lỗi"],
+    "feature": ["thêm", "tạo", "add", "làm"],
+    "analyze": ["kiểm tra", "phân tích", "check", "có vấn đề gì"]
+  },
+  "autoResponse": {
+    "generateCode": true,
+    "applyChanges": true,
+    "explainChanges": true,
+    "showResults": true
+  },
+  "contextAwareness": {
+    "projectStructure": true,
+    "designPatterns": true,
+    "userPreferences": true,
+    "previousConversations": true
+  }
+}

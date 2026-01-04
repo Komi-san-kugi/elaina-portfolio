@@ -23,6 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Git automation scripts (ignore all .bat except push-github.bat)
+# Git automation scripts (ignore all .bat except docker-run.bat)
 *.bat
-!push-github.bat
+!docker-run.bat

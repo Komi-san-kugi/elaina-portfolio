@@ -3,7 +3,7 @@ import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import { FaGithub, FaFacebook, FaDiscord, FaCat, FaEye, FaTimes, FaMusic, FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp, FaVolumeMute, FaList, FaMobileAlt, FaDesktop, FaLaptop } from 'react-icons/fa'
 import { SiJavascript, SiPython, SiCss3 } from 'react-icons/si'
 import { saveVisitor, getVisitorCount, getVisitors } from './firebase'
-import { useAdaptivePerformance } from '../hooks/useAdaptivePerformance'
+import { useAdaptivePerformance } from './hooks/useAdaptivePerformance'
 import PerformanceIndicator from './components/PerformanceIndicator'
 import './App.css'
 
